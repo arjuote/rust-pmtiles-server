@@ -1,0 +1,23 @@
+{
+  "options": {
+    "paths": {
+      "root": "./tests",
+      "fonts": "fonts",
+      "sprites": "",
+      "icons": "",
+      "styles": "styles",
+      "pmtiles": "data"
+    },
+    "domains": ["http://api.example.com/tile"]
+  },
+  "styles": {
+    "cadastral": {
+      "style": "cadastral.json"
+    }
+  },
+  "data": {
+    "cadastral_fi": {
+      "pmtiles": "cadastral_fi.pmtiles"
+    }
+  }
+}
