@@ -1,0 +1,95 @@
+{
+  "version": 8,
+  "name": "Cadastral Map",
+  "center": [25, 60.5],
+  "zoom": 12,
+  "bearing": 0,
+  "pitch": 0,
+  "sources": {
+    "cadastral_fi": {
+      "url": "http://api.example.com/tile/data/cadastral_fi",
+      "type": "vector"
+    }
+  },
+  "sprite": "",
+  "glyphs": "http://api.example.com/tile/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "other_border",
+      "filter": [
+        "none",
+        [
+          "any",
+          ["==", "type", "city_border"],
+          ["==", "type", "state_border"],
+          ["==", "type", "district_border"]
+        ]
+      ],
+      "type": "line",
+      "source": "cadastral_fi",
+      "source-layer": "property_borders",
+      "paint": {
+        "line-width": 1,
+        "line-color": "hsl(0, 100%, 54%)"
+      },
+      "minzoom": 14
+    },
+    {
+      "id": "district_border",
+      "filter": ["==", "type", "district_border"],
+      "type": "line",
+      "source": "cadastral_fi",
+      "source-layer": "property_borders",
+      "paint": {
+        "line-width": 2,
+        "line-color": "hsl(0, 100%, 54%)"
+      },
+      "minzoom": 14
+    },
+    {
+      "id": "city_border",
+      "filter": ["==", "type", "city_border"],
+      "type": "line",
+      "source": "cadastral_fi",
+      "source-layer": "city_borders",
+      "paint": {
+        "line-width": 2,
+        "line-dasharray": [4, 2, 1, 2],
+        "line-color": "hsl(0, 100%, 54%)"
+      },
+      "minzoom": 8
+    },
+    {
+      "id": "state_border",
+      "filter": ["==", "type", "state_border"],
+      "type": "line",
+      "source": "cadastral_fi",
+      "source-layer": "state_borders",
+      "paint": {
+        "line-width": 5,
+        "line-dasharray": [1, 3, 2, 3],
+        "line-color": "hsl(0, 100%, 54%)"
+      },
+      "minzoom": 5
+    },
+    {
+      "id": "labels",
+      "minzoom": 16,
+      "type": "symbol",
+      "source": "cadastral_fi",
+      "source-layer": "labels",
+      "layout": {
+        "text-field": ["to-string", ["get", "label"]],
+        "text-font": ["Arial Unicode MS Bold", "Arial Unicode MS Regular"],
+        "text-size": 14,
+        "text-padding": 10
+      },
+      "paint": {
+        "text-halo-color": "hsl(0, 0%, 0%)",
+        "text-halo-width": 0.5,
+        "text-color": "hsl(0, 0%, 100%)",
+        "text-halo-blur": 0.5
+      }
+    }
+  ]
+}

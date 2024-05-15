@@ -1,0 +1,24 @@
+{
+  "options": {
+    "paths": {
+      "home": "",
+      "root": "./testdata",
+      "fonts": "fonts",
+      "sprites": null,
+      "icons": null,
+      "styles": "styles",
+      "pmtiles": "data"
+    },
+    "domains": ["http://localhost:5000"]
+  },
+  "styles": {
+    "cadastral": {
+      "style": "cadastral.json"
+    }
+  },
+  "data": {
+    "cadastral_fi": {
+      "pmtiles": "data.pmtiles"
+    }
+  }
+}
