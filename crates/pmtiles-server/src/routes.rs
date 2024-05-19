@@ -1,5 +1,6 @@
 use crate::config::{prefix_with_home, ServerConfig};
 use crate::error::APIError;
+use crate::font::fetch_fonts;
 use crate::server::AppState;
 use crate::style::{Style, TileSource};
 use axum::body::Body;
@@ -98,7 +99,7 @@ async fn get_tile(
         tracing::error!("unable to get tileset: {}", err);
         APIError::NotFound(Some("tileset not found".into()))
     })?;
-    tracing::info!("Fetching tiles from path {}", path);
+    tracing::debug!("Fetching tiles from path {}", path);
     let (z, x, y) = parse_tile(&tile)?;
     let fetcher: &S3OrLocalFetcher = state.fetcher.borrow();
     let cache: &InMemoryCache = state.cache.borrow();
@@ -117,12 +118,30 @@ async fn get_tile(
     }
 }
 
-async fn get_font(
+async fn get_fontstack(
     State(state): State<AppState>,
     Path((fontstack, range)): Path<(String, String)>,
 ) -> Result<Response, APIError> {
     let range = range.replace(".pbf", "");
-    todo!()
+    let font_paths_resolved = fontstack
+        .split(",")
+        .map(|f| state.config.get_font_path(f.trim(), &range))
+        .collect::<Result<Vec<_>, anyhow::Error>>()?;
+    let fetcher: &S3OrLocalFetcher = state.fetcher.borrow();
+    let cache: &InMemoryCache = state.cache.borrow();
+    let result = fetch_fonts(font_paths_resolved, fetcher, Some(cache)).await;
+    match result {
+        Ok(fonts_pbf) => Response::builder()
+            .body(Body::from(fonts_pbf))
+            .map_err(|err| {
+                tracing::error!("{}", err);
+                APIError::Internal("invalid font data".into())
+            }),
+        Err(err) => {
+            tracing::error!("{}", err);
+            Err(err)
+        }
+    }
 }
 
 async fn get_sprite(
@@ -180,7 +199,7 @@ pub fn create_router(state: AppState) -> Router {
     if let Some(fonts_path) = &state.config.options.paths.fonts {
         let mut get_font_path = format!("/{}/:fontstack/*range", fonts_path);
         prefix_with_home(&mut get_font_path, &state.config, true, false);
-        router = router.route(&get_font_path, get(get_font));
+        router = router.route(&get_font_path, get(get_fontstack));
         tracing::debug!("Exposing path: \nGET {}", get_font_path,);
     }
     if let Some(sprites_path) = &state.config.options.paths.sprites {

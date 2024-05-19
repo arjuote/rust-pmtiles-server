@@ -104,7 +104,7 @@ pub async fn get_headers<T: Fetcher, C: Cache>(
 
     let raw_data = match cache_hit {
         Some(cached) => {
-            tracing::info!("cache hit for key {}", path);
+            tracing::debug!("cache hit for key {}", path);
             cached
         }
         None => {
@@ -114,7 +114,7 @@ pub async fn get_headers<T: Fetcher, C: Cache>(
                 if let Err(err) = res {
                     tracing::warn!("failed to cache key {} with {}", path, err);
                 } else {
-                    tracing::info!("cached key {}", path);
+                    tracing::debug!("cached key {}", path);
                 }
             };
             data

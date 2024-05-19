@@ -16,10 +16,8 @@ use tower_http::{compression::CompressionLayer, cors::CorsLayer, trace::TraceLay
 use tracing::Level;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
 
-// TODO: - add builder for router to match the configured prefixes
-//       - add endpoints for fetching fonts and sprites(?)
-//       - refactor project into workspace with rust-pmtiles-server and pmtiles crates
-//       - refactor dev/lambda endpoints to dev/standalone server
+// TODO:
+//       - add endpoints fetching sprites
 //       - put lambda specific stuff in server behind a feature flag
 //       - put s3 specific stuff in pmtiles behind a feature flag
 //       - test as MVTLayer lambda
@@ -71,7 +69,6 @@ pub async fn serve(serve: bool) -> Result<(), Error> {
         .with(EnvFilter::from("info"))
         .init();
     tracing::info!("Starting server");
-    tracing::info!("Initialized dev tracing");
 
     // Set up CORS
     let cors_layer = CorsLayer::new()
@@ -108,7 +105,10 @@ pub async fn serve(serve: bool) -> Result<(), Error> {
         let listener = TcpListener::bind(addr).await.unwrap();
         axum::serve(listener, app.into_make_service())
             .await
-            .map_err(Error::msg)
+            .map_err(|err| {
+                tracing::error!("{}", err);
+                Error::msg(err)
+            })
     } else {
         tracing::info!("Running pmtileserver as a lambda function");
         let app = tower::ServiceBuilder::new()

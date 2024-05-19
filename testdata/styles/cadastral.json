@@ -7,7 +7,7 @@
   "pitch": 0,
   "sources": {
     "cadastral_fi": {
-      "url": "pmtiles://cadastral_fi.pmtiles",
+      "url": "pmtiles://data.pmtiles",
       "type": "vector"
     }
   },
@@ -58,19 +58,6 @@
         "line-color": "hsl(0, 100%, 54%)"
       },
       "minzoom": 8
-    },
-    {
-      "id": "state_border",
-      "filter": ["==", "type", "state_border"],
-      "type": "line",
-      "source": "cadastral_fi",
-      "source-layer": "state_borders",
-      "paint": {
-        "line-width": 5,
-        "line-dasharray": [1, 3, 2, 3],
-        "line-color": "hsl(0, 100%, 54%)"
-      },
-      "minzoom": 5
     },
     {
       "id": "labels",
