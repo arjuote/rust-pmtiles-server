@@ -45,7 +45,6 @@ impl ServerConfig {
     }
     pub fn get_tileset_path(&self, tileset: &str) -> anyhow::Result<String> {
         let root = canonicalize_local_path(&self.options.paths.root.clone().unwrap_or(".".into()))?;
-        tracing::info!("Root path: {}", root);
         let found = self
             .data
             .get(tileset)

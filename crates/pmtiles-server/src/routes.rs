@@ -98,7 +98,7 @@ async fn get_tile(
         tracing::error!("unable to get tileset: {}", err);
         APIError::NotFound(Some("tileset not found".into()))
     })?;
-    tracing::info!("Fetching tiles from path {}", path);
+    tracing::debug!("Fetching tiles from path {}", path);
     let (z, x, y) = parse_tile(&tile)?;
     let fetcher: &S3OrLocalFetcher = state.fetcher.borrow();
     let cache: &InMemoryCache = state.cache.borrow();
