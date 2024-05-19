@@ -43,6 +43,11 @@ impl ServerConfig {
         let style_path = &style.style;
         Ok(format!("{}/{}/{}", root, styles_prefix, style_path))
     }
+    pub fn get_font_path(&self, font: &str, range: &str) -> anyhow::Result<String> {
+        let root = canonicalize_local_path(&self.options.paths.root.clone().unwrap_or(".".into()))?;
+        let fonts_prefix = &self.options.paths.fonts.clone().unwrap_or("fonts".into());
+        Ok(format!("{}/{}/{}/{}.pbf", root, fonts_prefix, font, range))
+    }
     pub fn get_tileset_path(&self, tileset: &str) -> anyhow::Result<String> {
         let root = canonicalize_local_path(&self.options.paths.root.clone().unwrap_or(".".into()))?;
         let found = self

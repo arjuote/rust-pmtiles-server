@@ -16,6 +16,7 @@ async fn main() -> Result<(), Error> {
 
 mod config;
 mod error;
+mod font;
 mod routes;
 mod server;
 mod style;
