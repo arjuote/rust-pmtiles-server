@@ -42,7 +42,7 @@ pub async fn get_config<T: Fetcher>(client: &T, path: &str) -> Result<ServerConf
     Ok(cfg)
 }
 
-pub async fn serve(serve: bool) -> Result<(), Error> {
+pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Error> {
     // Trace every request
     let trace_layer = TraceLayer::new_for_http()
         .make_span_with(
@@ -99,9 +99,9 @@ pub async fn serve(serve: bool) -> Result<(), Error> {
         .layer(CompressionLayer::new().gzip(true).br(true));
 
     if serve {
-        let port = 5000;
-        tracing::info!("Running pmtileserver as normal server at port {}", port);
-        let addr = std::net::SocketAddr::from(([127, 0, 0, 1], port));
+        tracing::info!("Running pmtileserver as server at {}:{}", listen_addr, port);
+        let listen_addr = format!("{}:{}", listen_addr, port);
+        let addr: std::net::SocketAddr = listen_addr.parse().expect("invalid listen address");
         let listener = TcpListener::bind(addr).await.unwrap();
         axum::serve(listener, app.into_make_service())
             .await
