@@ -104,6 +104,7 @@ async fn get_tile(
     let tile_res = pmtiles_core::get_tile(z, x, y, &path, fetcher, Some(cache)).await;
     match tile_res {
         Ok(tile_data) => Response::builder()
+            .header("Content-Type", "application/octet-stream")
             .body(Body::from(tile_data))
             .map_err(|err| {
                 tracing::error!("{}", err);
