@@ -56,10 +56,7 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
                 let duration_ms = duration.as_millis();
                 tracing::info!(parent: span, status = %status, duration = %duration_ms);
             },
-        )
-        .on_request(|_: &Request<Body>, _: &tracing::Span| {
-            tracing::info!(message = "begin request!")
-        });
+        );
 
     let lyr = tracing_subscriber::fmt::Layer::default()
         .with_file(true)
