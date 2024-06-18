@@ -140,10 +140,12 @@ pub fn prefix_with_home(
     trailing_slash: bool,
 ) {
     if let Some(home) = &cfg.options.paths.home {
-        if trailing_slash {
-            path.insert_str(0, &format!("{}/", home.trim_end_matches("/")));
-        } else {
-            path.insert_str(0, home);
+        if !home.is_empty() {
+            if trailing_slash {
+                path.insert_str(0, &format!("{}/", home.trim_end_matches("/")));
+            } else {
+                path.insert_str(0, home);
+            }
         }
     }
     if leading_slash && !path.starts_with("/") {
