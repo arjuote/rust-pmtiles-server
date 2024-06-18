@@ -25,3 +25,15 @@ pub fn pick_random_element<T>(array: &[T]) -> Option<&T> {
     let index = rng.gen_range(0..array.len());
     array.get(index)
 }
+
+pub fn join_path(part1: &str, part2: &str) -> String {
+    format!(
+        "{}/{}",
+        part1.trim_end_matches("/"),
+        part2.trim_start_matches("/")
+    )
+}
+
+pub fn trim_slash(path: &str) -> String {
+    format!("{}", path.trim_matches('/'))
+}

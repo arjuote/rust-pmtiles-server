@@ -1,4 +1,4 @@
-use crate::config::{get_path, ServerConfig};
+use crate::config::{get_data_path, get_path, ServerConfig};
 use pmtiles_core::models::Headers;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -35,7 +35,7 @@ impl Style {
             .sources
             .into_iter()
             .map(|(key, mut src)| {
-                let path = get_path(&src.url, &config);
+                let path = get_data_path(&key, &src.url, &config);
                 src.url = format!("{}/{}", &domain, &path);
                 (key, src)
             })
