@@ -1,4 +1,7 @@
-use crate::config::{get_path, ServerConfig};
+use crate::{
+    config::{get_data_path, get_path, prefix_with_home, ServerConfig},
+    utils::join_path,
+};
 use pmtiles_core::models::Headers;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -35,7 +38,7 @@ impl Style {
             .sources
             .into_iter()
             .map(|(key, mut src)| {
-                let path = get_path(&src.url, &config);
+                let path = get_data_path(&key, &src.url, &config);
                 src.url = format!("{}/{}", &domain, &path);
                 (key, src)
             })
@@ -122,11 +125,14 @@ impl TileSource {
         )
         .unwrap_or_else(|_| vec![]);
 
-        let tile_urls = vec![format!(
-            "{}/{}/{{z}}/{{x}}/{{y}}.pbf",
-            cfg.get_domain(),
-            tileset
-        )];
+        let tile_urls = vec![format!("{}/{{z}}/{{x}}/{{y}}.pbf", tileset)]
+            .into_iter()
+            .map(|mut x| {
+                prefix_with_home(&mut x, cfg, true, true);
+                join_path(&cfg.get_domain(), &x)
+            })
+            .collect();
+
         Ok(TileSource {
             tilejson: "3.0.0".into(),
             name: name.map(ToOwned::to_owned),

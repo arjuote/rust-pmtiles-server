@@ -35,9 +35,7 @@ async fn fetch_style<F: Fetcher>(
         tracing::error!("unable to parse style {}: {}", style_id, err);
         APIError::Internal("error parsing style".into())
     })?;
-    println!("{:?}", style);
     let resolved = style.resolve(&config);
-    println!("{:?}", resolved);
     Ok(resolved)
 }
 
@@ -92,7 +90,6 @@ fn parse_tile(tile_param: &str) -> Result<(u64, u64, u64), APIError> {
 
 async fn get_tile(
     State(state): State<AppState>,
-    // Path(params): Path<GetTileParams>,
     Path((tileset, tile)): Path<(String, String)>,
 ) -> Result<Response, APIError> {
     let path = &state.config.get_tileset_path(&tileset).map_err(|err| {
@@ -106,6 +103,7 @@ async fn get_tile(
     let tile_res = pmtiles_core::get_tile(z, x, y, &path, fetcher, Some(cache)).await;
     match tile_res {
         Ok(tile_data) => Response::builder()
+            .header("Content-Type", "application/octet-stream")
             .body(Body::from(tile_data))
             .map_err(|err| {
                 tracing::error!("{}", err);

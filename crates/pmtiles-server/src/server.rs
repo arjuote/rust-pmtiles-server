@@ -3,9 +3,8 @@ use crate::error::APIError;
 use crate::routes::create_router;
 use anyhow::Error;
 use aws_sdk_s3 as s3;
+use axum::body::Body;
 use axum::response::Response;
-use axum::{body::Body, http};
-use http::Request;
 use pmtiles_core::cache::InMemoryCache;
 use pmtiles_core::fetcher::{Fetcher, S3OrLocalFetcher};
 use std::sync::Arc;
@@ -19,11 +18,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 // TODO:
 //       - add endpoints fetching sprites
 //       - put lambda specific stuff in server behind a feature flag
-//       - put s3 specific stuff in pmtiles behind a feature flag
-//       - test as MVTLayer lambda
 //       - test as mapbox style lambda
-//       - fix bug with real lambda dropping off most of the binary payload if no compression is used
-//          - this is likely related to the strangeness of lambda binary data handling. Investigate cargo-lambda docs for clues.
 
 #[derive(Clone)]
 pub struct AppState {
@@ -56,10 +51,7 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
                 let duration_ms = duration.as_millis();
                 tracing::info!(parent: span, status = %status, duration = %duration_ms);
             },
-        )
-        .on_request(|_: &Request<Body>, _: &tracing::Span| {
-            tracing::info!(message = "begin request!")
-        });
+        );
 
     let lyr = tracing_subscriber::fmt::Layer::default()
         .with_file(true)
@@ -99,7 +91,11 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
         .layer(CompressionLayer::new().gzip(true).br(true));
 
     if serve {
-        tracing::info!("Running pmtileserver as server at {}:{}", listen_addr, port);
+        tracing::info!(
+            "Running pmtiles-server as server at {}:{}",
+            listen_addr,
+            port
+        );
         let listen_addr = format!("{}:{}", listen_addr, port);
         let addr: std::net::SocketAddr = listen_addr.parse().expect("invalid listen address");
         let listener = TcpListener::bind(addr).await.unwrap();
@@ -110,7 +106,7 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
                 Error::msg(err)
             })
     } else {
-        tracing::info!("Running pmtileserver as a lambda function");
+        tracing::info!("Running pmtiles-server as a lambda function");
         let app = tower::ServiceBuilder::new()
             .layer(axum_aws_lambda::LambdaLayer::default())
             .service(app);

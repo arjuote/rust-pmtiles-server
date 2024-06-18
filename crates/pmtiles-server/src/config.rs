@@ -1,6 +1,6 @@
 use crate::{
     error::APIError,
-    utils::{canonicalize_local_path, pick_random_element},
+    utils::{canonicalize_local_path, join_path, pick_random_element, trim_slash},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -76,26 +76,43 @@ impl ServerConfig {
     }
 }
 
+pub fn get_data_path(source: &str, url: &str, config: &ServerConfig) -> String {
+    let parsed = Url::parse(url);
+    if let Ok(parsed) = parsed {
+        // Parse the path part and restore the curly braces that get url-encoded
+        let prefix = match parsed.scheme() {
+            "pmtiles" => config.options.paths.pmtiles.as_ref(),
+            _ => None,
+        };
+        let path = source.to_string();
+        let mut prefixed_path = {
+            if let Some(prefix) = prefix {
+                trim_slash(&join_path(prefix, &path))
+            } else {
+                trim_slash(&path)
+            }
+        };
+        prefix_with_home(&mut prefixed_path, &config, false, true);
+        return prefixed_path;
+    }
+    return "".to_owned();
+}
+
 pub fn get_path(url: &str, config: &ServerConfig) -> String {
     let parsed = Url::parse(url);
     if let Ok(parsed) = parsed {
         // Parse the path part and restore the curly braces that get url-encoded
         let path_part = parsed.path().replace("%7B", "{").replace("%7D", "}");
         let prefix = match parsed.scheme() {
-            "pmtiles" => config.options.paths.pmtiles.as_ref(),
             "fonts" => config.options.paths.fonts.as_ref(),
             "sprites" => config.options.paths.sprites.as_ref(),
             "styles" => config.options.paths.styles.as_ref(),
             _ => None,
         };
-        let mut path = {
+        let path = {
             if let Some(domain) = parsed.domain() {
                 if !path_part.is_empty() {
-                    format!(
-                        "{}/{}",
-                        domain.trim_end_matches("/").trim_start_matches("/"),
-                        path_part.trim_end_matches("/").trim_start_matches("/")
-                    )
+                    trim_slash(&join_path(domain, &path_part))
                 } else {
                     domain.to_string()
                 }
@@ -103,18 +120,11 @@ pub fn get_path(url: &str, config: &ServerConfig) -> String {
                 path_part.to_string()
             }
         };
-        if path.ends_with(".pmtiles") {
-            path = path.replace(".pmtiles", "");
-        }
         let mut prefixed_path = {
             if let Some(prefix) = prefix {
-                format!(
-                    "{}/{}",
-                    prefix.trim_end_matches("/").trim_start_matches("/"),
-                    path.trim_end_matches("/").trim_start_matches("/")
-                )
+                trim_slash(&join_path(prefix, &path))
             } else {
-                format!("{}", path.trim_end_matches("/").trim_start_matches("/"))
+                trim_slash(&path)
             }
         };
         prefix_with_home(&mut prefixed_path, &config, false, true);
@@ -130,10 +140,12 @@ pub fn prefix_with_home(
     trailing_slash: bool,
 ) {
     if let Some(home) = &cfg.options.paths.home {
-        if trailing_slash {
-            path.insert_str(0, &format!("{}/", home.trim_end_matches("/")));
-        } else {
-            path.insert_str(0, home);
+        if !home.is_empty() {
+            if trailing_slash {
+                path.insert_str(0, &format!("{}/", home.trim_end_matches("/")));
+            } else {
+                path.insert_str(0, home);
+            }
         }
     }
     if leading_slash && !path.starts_with("/") {
