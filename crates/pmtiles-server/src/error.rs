@@ -1,5 +1,5 @@
 use axum::{extract::rejection::BytesRejection, http::StatusCode, response::IntoResponse, Json};
-use pmtiles::{fetcher::FetcherError, PMTilesError};
+use pmtiles_core::{fetcher::FetcherError, PMTilesError};
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 use thiserror::Error;
 

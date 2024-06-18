@@ -4,7 +4,7 @@ version = "0.1.1"
 edition = "2021"
 
 [dependencies]
-pmtiles = {path = "../pmtiles", features = ["s3"]}
+pmtiles-core = {path = "../pmtiles-core", features = ["s3"]}
 anyhow = "1.0.83"
 axum-aws-lambda = "0.6.0"
 aws-sdk-s3 = {version = "1.25.0"}

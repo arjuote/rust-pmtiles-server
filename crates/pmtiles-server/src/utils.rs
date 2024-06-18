@@ -1,4 +1,4 @@
-use pmtiles::s3utils::is_s3_path;
+use pmtiles_core::s3utils::is_s3_path;
 use rand::Rng;
 
 pub fn canonicalize_local_path(path: &str) -> anyhow::Result<String> {

@@ -1,5 +1,5 @@
 use crate::config::{get_path, ServerConfig};
-use pmtiles::models::Headers;
+use pmtiles_core::models::Headers;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;

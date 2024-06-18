@@ -9,9 +9,9 @@ use axum::response::{IntoResponse, Response};
 use axum::Json;
 use axum::{routing::get, Router};
 use hyper::StatusCode;
-use pmtiles::cache::InMemoryCache;
-use pmtiles::fetcher::{Fetcher, S3OrLocalFetcher};
-use pmtiles::{self, get_metadata};
+use pmtiles_core::cache::InMemoryCache;
+use pmtiles_core::fetcher::{Fetcher, S3OrLocalFetcher};
+use pmtiles_core::{self, get_metadata};
 use std::borrow::Borrow;
 
 async fn fetch_style<F: Fetcher>(
@@ -103,7 +103,7 @@ async fn get_tile(
     let (z, x, y) = parse_tile(&tile)?;
     let fetcher: &S3OrLocalFetcher = state.fetcher.borrow();
     let cache: &InMemoryCache = state.cache.borrow();
-    let tile_res = pmtiles::get_tile(z, x, y, &path, fetcher, Some(cache)).await;
+    let tile_res = pmtiles_core::get_tile(z, x, y, &path, fetcher, Some(cache)).await;
     match tile_res {
         Ok(tile_data) => Response::builder()
             .body(Body::from(tile_data))
