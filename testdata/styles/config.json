@@ -17,7 +17,7 @@
   },
   "data": {
     "cadastral_fi": {
-      "pmtiles": "cadastral_fi.pmtiles"
+      "pmtiles": "data.pmtiles"
     }
   }
 }

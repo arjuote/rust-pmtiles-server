@@ -3,9 +3,8 @@ use crate::error::APIError;
 use crate::routes::create_router;
 use anyhow::Error;
 use aws_sdk_s3 as s3;
+use axum::body::Body;
 use axum::response::Response;
-use axum::{body::Body, http};
-use http::Request;
 use pmtiles_core::cache::InMemoryCache;
 use pmtiles_core::fetcher::{Fetcher, S3OrLocalFetcher};
 use std::sync::Arc;
@@ -19,11 +18,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 // TODO:
 //       - add endpoints fetching sprites
 //       - put lambda specific stuff in server behind a feature flag
-//       - put s3 specific stuff in pmtiles behind a feature flag
-//       - test as MVTLayer lambda
 //       - test as mapbox style lambda
-//       - fix bug with real lambda dropping off most of the binary payload if no compression is used
-//          - this is likely related to the strangeness of lambda binary data handling. Investigate cargo-lambda docs for clues.
 
 #[derive(Clone)]
 pub struct AppState {

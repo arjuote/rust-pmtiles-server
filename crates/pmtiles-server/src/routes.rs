@@ -90,7 +90,6 @@ fn parse_tile(tile_param: &str) -> Result<(u64, u64, u64), APIError> {
 
 async fn get_tile(
     State(state): State<AppState>,
-    // Path(params): Path<GetTileParams>,
     Path((tileset, tile)): Path<(String, String)>,
 ) -> Result<Response, APIError> {
     let path = &state.config.get_tileset_path(&tileset).map_err(|err| {
