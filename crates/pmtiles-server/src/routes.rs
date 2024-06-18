@@ -35,9 +35,7 @@ async fn fetch_style<F: Fetcher>(
         tracing::error!("unable to parse style {}: {}", style_id, err);
         APIError::Internal("error parsing style".into())
     })?;
-    println!("{:?}", style);
     let resolved = style.resolve(&config);
-    println!("{:?}", resolved);
     Ok(resolved)
 }
 
