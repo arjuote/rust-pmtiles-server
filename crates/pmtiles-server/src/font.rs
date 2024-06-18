@@ -1,6 +1,6 @@
 use pbf_font_tools::protobuf::{self, Message};
 use pbf_font_tools::{combine_glyphs, Glyphs};
-use pmtiles::{cache::Cache, fetcher::Fetcher};
+use pmtiles_core::{cache::Cache, fetcher::Fetcher};
 
 use crate::error::APIError;
 
@@ -69,9 +69,9 @@ pub async fn fetch_fonts<F: Fetcher, C: Cache>(
 }
 
 #[cfg(test)]
-use pmtiles::cache::InMemoryCache;
+use pmtiles_core::cache::InMemoryCache;
 #[cfg(test)]
-use pmtiles::fetcher::LocalFetcher;
+use pmtiles_core::fetcher::LocalFetcher;
 
 #[tokio::test]
 async fn test_fetch_fonts() {
