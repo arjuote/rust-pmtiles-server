@@ -96,7 +96,11 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
         .layer(CompressionLayer::new().gzip(true).br(true));
 
     if serve {
-        tracing::info!("Running pmtileserver as server at {}:{}", listen_addr, port);
+        tracing::info!(
+            "Running pmtiles-server as server at {}:{}",
+            listen_addr,
+            port
+        );
         let listen_addr = format!("{}:{}", listen_addr, port);
         let addr: std::net::SocketAddr = listen_addr.parse().expect("invalid listen address");
         let listener = TcpListener::bind(addr).await.unwrap();
@@ -107,7 +111,7 @@ pub async fn serve(serve: bool, listen_addr: &str, port: u32) -> Result<(), Erro
                 Error::msg(err)
             })
     } else {
-        tracing::info!("Running pmtileserver as a lambda function");
+        tracing::info!("Running pmtiles-server as a lambda function");
         let app = tower::ServiceBuilder::new()
             .layer(axum_aws_lambda::LambdaLayer::default())
             .service(app);
